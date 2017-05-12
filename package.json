@@ -1,6 +1,6 @@
 {
   "name": "node-locator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
   "main": "index.js",
   "scripts": {
