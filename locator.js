@@ -5,12 +5,12 @@ class Locator {
     /**
      * @param {config} config
      * @param {{}} locatableConfig
-     * @param {string} relativePathModifierToRoot eg '../' if the locator is one folder deep from the root
+     * @param {string} relativePathModifierToRoot eg '../../' if the locator is one folder deep from the root
      */
     constructor(config, locatableConfig, relativePathModifierToRoot) {
         this._config = config;
         this._locatableConfig = locatableConfig;
-        this._relativePathModifierToRoot = relativePathModifierToRoot;
+        this._relativePathModifierToRoot = relativePathModifierToRoot || '../../';
 
         this._locatable = {};
     }
