@@ -1,0 +1,14 @@
+{
+  "name": "node-locator",
+  "version": "0.0.1",
+  "description": "A simple dependency injection container/locator for nodejs based on config files",
+  "main": "locator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ruud Arentsen",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^1.26.1"
+  }
+}
