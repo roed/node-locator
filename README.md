@@ -1,6 +1,7 @@
 # node-locator
 
 [![NPM](https://nodei.co/npm/node-locator.svg?downloads=true&downloadRank=true)](https://nodei.co/npm/node-locator/)&nbsp;&nbsp;
+[![Build Status](https://secure.travis-ci.org/roed/node-locator.svg?branch=master)](https://travis-ci.org/roed/node-locator)
 
 A simple service locator and dependency container for Node.js using service definition files.
 
