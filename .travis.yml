@@ -1,0 +1,7 @@
+language: node_js
+sudo: false
+before_install:
+  - npm update -g npm
+node_js:
+  - "7"
+  - "6"
