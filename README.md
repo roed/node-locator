@@ -23,18 +23,53 @@ module.exports = {
             '%some.config.property%' //reference to a config property -> will inject config.get('some.config.property')
         ]
     ],
+    'key.of.another.class.this.class.depends.on': [],
+    //etc
 }
 ```
+By creating a `development.js`, you can override certain definitions.
 
 Using the factory:
 ```javascript
 //this will create an instance of the Locator
 let locator = require('node-locator').LocatorFactory();
-
-//retrieving an instance
-let instanceOfYourClass = locator.get('some.key');
 ```
 
+### Injecting dependencies from node_modules
+If you want to inject an instance of a class from the node_modules folder, use the following code:
+```javascript
+'some-node-modules-dependency-key': [
+    'some-node-dependency', //will result in something like: let dep = require('some-node-dependency'); new dep(//constructor args);
+    [
+        //constructor args
+    ]
+]
+```
+
+### Custom root directory or configuration file location
+It is possible to pass another root directory or configuration file location. You can do this like:
+```javascript
+let locator = require('node-locator').LocatorFactory('../../some/other/root/', 'custom-config-dir/');
+```
+The locator will look for your classes in the directory `/some/other/root/`. The `../../` is needed because node.js uses relative paths. Because this module will be installed in `node_modules/node-locator`, we need to go 2 directories up first.
+
+The factory will look for the service definitions in `/some/other/root/custom-config-dir/` in this case.
+
+## Creating the Locator manually
+It is also possible to use the locator manually, which will give you the flexibility to create multiple locators, or skip the environment/config file part:
+```javascript
+let Locator = require('node-locator').Locator;
+let locator = new Locator(require('config'), {
+    //define your services like above
+});
+```
+The third parameter of the constructor can be used to define another root directory. The logic is the same as that for the factory.
+
+## Using the locator
+You can use the locator by calling the `get` method
+```javascript
+let instanceOfYourClass = locator.get('some.key');
+```
 
 ## Dependencies
 
