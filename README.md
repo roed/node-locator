@@ -1,6 +1,8 @@
 # node-locator
 
-A simple service locator and dependency container for Node.js
+[![NPM](https://nodei.co/npm/node-locator.svg?downloads=true&downloadRank=true)](https://nodei.co/npm/node-locator/)&nbsp;&nbsp;
+
+A simple service locator and dependency container for Node.js using service definition files.
 
 ## How to use
 
