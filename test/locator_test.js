@@ -55,8 +55,8 @@ describe('Locator', () => {
 
     it('should be able to inject config parameters', () => {
         let locator = new Locator(config, {
-            'some.config.dependent.service': [
-                './some_config_dependent_service', [
+            'some.config.property.dependent.service': [
+                './some_config_property_dependent_service', [
                     '%some.config%'
                 ]
             ],
@@ -67,7 +67,38 @@ describe('Locator', () => {
             return 'cool!';
         };
 
-        let service = locator.get('some.config.dependent.service');
+        let service = locator.get('some.config.property.dependent.service');
         assert.equal(service.someConfigProperty, 'cool!');
+    });
+
+    it('should be able to inject a "hard" require', () => {
+        let locator = new Locator(config, {
+            'some.requirable.dependent.service': [
+                './some_requirable_dependent_service', [
+                    '~./some_requirable_function'
+                ]
+            ],
+        }, path);
+
+        let fn = require('./locatable/some_requirable_function');
+
+        let service = locator.get('some.requirable.dependent.service');
+        assert.strictEqual(service.requirableFunction, fn);
+    });
+
+    it('should inject normal strings when reserved characters are escaped', () => {
+        const reservedCharacters = ['%', '@', '~'];
+        for (let reservedCharacter of reservedCharacters) {
+            let locator = new Locator(config, {
+                'some.string.dependent.service': [
+                    './some_string_dependent_service', [
+                        reservedCharacter + reservedCharacter + 'hi'
+                    ]
+                ],
+            }, path);
+
+            let service = locator.get('some.string.dependent.service');
+            assert.equal(reservedCharacter + 'hi', service.someString);
+        }
     });
 });

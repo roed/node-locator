@@ -38,7 +38,7 @@ Using the factory:
 let locator = require('node-locator').LocatorFactory();
 ```
 
-### Injecting dependencies from node_modules
+### Injecting class based dependencies from node_modules
 If you want to inject an instance of a class from the node_modules folder, use the following code:
 ```javascript
 'some-node-modules-dependency-key': [
@@ -47,6 +47,37 @@ If you want to inject an instance of a class from the node_modules folder, use t
         //constructor args
     ]
 ]
+```
+
+### Injecting functions
+Not all dependencies have to be classes. A lot of modules available for node.js expose only a function when required. You can inject them like this:
+```javascript
+'some.key': [
+    './path/to/your/class',
+    [
+        '~some-function', //will result in require('some-function')
+        '~./some-non-node-modules-function' //will result in require('./path/to/your/some-non-node-modules-function')
+    ]
+]
+```
+
+## Injecting primitive values
+It's also possible to inject primitive values:
+```javascript
+'some.key': [
+    './path/to/your/class',
+    [
+        123,
+        true,
+        'some string'
+    ]
+]
+```
+Because the locator also uses strings to inject other dependencies, if the string you want to inject starts with %, @ or ~, you will have to escape it like this:
+```
+'@@some-string' //the value '@some-string' will be injected
+'%%some-string' //the value '%some-string' will be injected
+'~~some-string' //the value '~some-string' will be injected
 ```
 
 ### Custom root directory or configuration file location

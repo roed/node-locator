@@ -1,6 +1,6 @@
 'use strict';
 
-class SomeConfigDependentService {
+class SomeConfigPropertyDependentService {
 
     /**
      * {string} someConfigProperty
@@ -10,4 +10,4 @@ class SomeConfigDependentService {
     }
 }
 
-module.exports = SomeConfigDependentService;
+module.exports = SomeConfigPropertyDependentService;

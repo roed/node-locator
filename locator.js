@@ -13,6 +13,8 @@ class Locator {
         this._relativePathModifierToRoot = relativePathModifierToRoot || '../../';
 
         this._locatable = {};
+
+        this._reservedCharacters = ['%', '@', '~'];
     }
 
     /**
@@ -35,16 +37,24 @@ class Locator {
     }
 
     /**
+     * @param {string} requirable
+     * @returns {object}
+     * @private
+     */
+    _require(requirable) {
+        if (requirable[0] === '.' && requirable[1] === '/') {
+            requirable = this._relativePathModifierToRoot + requirable.substr(2);
+        }
+        return require(requirable);
+    }
+
+    /**
      * @param {{}} locatableConfig
      * @return {object}
      * @private
      */
     _createInstance(locatableConfig) {
-        let requirable = locatableConfig[0];
-        if (requirable[0] === '.' && requirable[1] === '/') {
-            requirable = this._relativePathModifierToRoot + requirable.substr(2);
-        }
-        let c = require(requirable);
+        let c = this._require(locatableConfig[0]);
 
         let dependencyConfigs = locatableConfig[1] || [];
         let dependencies = [];
@@ -64,15 +74,40 @@ class Locator {
             return dependencyConfig;
         }
         let firstChar = dependencyConfig[0];
+        let secondChar = dependencyConfig[1];
+
+        if (this._dependencyConfigIsEscaped(firstChar, secondChar)) {
+            return dependencyConfig.substr(1);
+        }
+        //config parameter
         if (firstChar === '%') {
             let configName = dependencyConfig.substr(1, dependencyConfig.length - 2);
             return this._config.get(configName);
         }
+        //another service
         if (firstChar === '@') {
             let name = dependencyConfig.substr(1);
             return this.get(name);
         }
+        //require
+        if (firstChar === '~') {
+            let requirable = dependencyConfig.substr(1);
+            return this._require(requirable);
+        }
         return dependencyConfig;
+    }
+
+    /**
+     * @param {string} firstChar
+     * @param {string} secondChar
+     * @returns {boolean}
+     * @private
+     */
+    _dependencyConfigIsEscaped(firstChar, secondChar) {
+        if (this._reservedCharacters.indexOf(firstChar) === -1) {
+            return false;
+        }
+        return firstChar === secondChar;
     }
 }
 
