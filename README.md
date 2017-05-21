@@ -61,7 +61,7 @@ Not all dependencies have to be classes. A lot of modules available for node.js 
 ]
 ```
 
-## Injecting primitive values
+### Injecting primitive values
 It's also possible to inject primitive values:
 ```javascript
 'some.key': [
