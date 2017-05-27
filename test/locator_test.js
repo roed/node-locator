@@ -101,4 +101,30 @@ describe('Locator', () => {
             assert.equal(reservedCharacter + 'hi', service.someString);
         }
     });
+
+    it('should be able to reference classes inside a require', () => {
+        let locator = new Locator(config, {
+            'some.nested.class': [
+                './some_nested_class[nested][moreNesting]'
+            ],
+        }, path);
+
+        let NestedClass = require('./locatable/some_nested_class').nested.moreNesting;
+        let service = locator.get('some.nested.class');
+        assert(service instanceof NestedClass);
+    });
+
+    it('should throw an error a reference to a class inside a require is wrong', () => {
+        let locator = new Locator(config, {
+            'some.nested.class': [
+                './some_nested_class[invalidNesting][moreNesting]'
+            ],
+        }, path);
+
+        assert.throws(() => {
+            locator.get('some.nested.class');
+        }, (e) => {
+            return e.message === 'Could not require ./some_nested_class[invalidNesting][moreNesting]';
+        });
+    });
 });

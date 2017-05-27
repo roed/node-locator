@@ -41,11 +41,34 @@ class Locator {
      * @returns {object}
      * @private
      */
+    /**
+     * @param {string} requirable
+     * @returns {object}
+     * @private
+     */
     _require(requirable) {
+        const originalRequirable = requirable;
+
         if (requirable[0] === '.' && requirable[1] === '/') {
             requirable = this._relativePathModifierToRoot + requirable.substr(2);
         }
-        return require(requirable);
+        if (requirable.indexOf('[') === -1) {
+            return require(requirable);
+        }
+        let splittedRequirable = requirable.split('[');
+        requirable = splittedRequirable[0];
+
+        let result = require(requirable);
+
+        splittedRequirable.shift();
+        while(splittedRequirable.length > 0) {
+            let subRequirable = splittedRequirable.shift().replace(']', '');
+            if (result[subRequirable] === undefined) {
+                throw new Error('Could not require ' + originalRequirable);
+            }
+            result = result[subRequirable];
+        }
+        return result;
     }
 
     /**

@@ -5,6 +5,43 @@
 
 A simple service locator and dependency container for Node.js using service definition files.
 
+## Example usage
+A lot of node.js code is written with ES6 classes. This module can manage dependencies and instances for your codebase.
+No need to to this anymore:
+```javascript
+let Service = require('../../../service/some-service');
+let SomeDependency1 = require('../../../other/dir/some-dependency-1');
+let SomeDependency2 = require('../../../other/dir/some-dependency-2');
+
+let someDependency1 = new SomeDependency1();
+let someDependency1 = new SomeDependency2();
+
+let service = new Service(someDependency1, someDependency1);
+service.doSomething();
+```
+
+But instead configure your dependencies with configuration files:
+```javascript
+module.exports = {
+    'some.key': ['./service/some-service', ['@dependency-1', '@dependency-2']],
+    'dependency-1': ['./other/dir/some-dependency-1'],
+    'dependency-2': ['./other/dir/some-dependency-2'],
+}
+```
+
+The locator will automatically create (and cache) instances when needed:
+```javascript
+let service = locator.get('some.service');
+service.doSomething();
+```
+
+## But why?
+- your class instances (of which you'd need only one instance per application) do not clutter your bootstrapping code anymore
+- the locator will create instances when needed, instead of creating all objects when the application loads
+- all the wiring of services is contained in one configuration file
+- easy to use different instances per environment (for instance, if you want to mock api calls to external parties on your development environment)
+- easy to inject configuration
+
 ## How to use
 
 There are 2 ways to use this module:
@@ -78,6 +115,22 @@ Because the locator also uses strings to inject other dependencies, if the strin
 '@@some-string' //the value '@some-string' will be injected
 '%%some-string' //the value '%some-string' will be injected
 '~~some-string' //the value '~some-string' will be injected
+```
+
+### Require nested classes
+Sometimes, a module exposes an object containing classes. For instance:
+```javascript
+module.exports {
+    classA: ClassA,
+    classB: ClassB
+}
+```
+
+These objects can be required like this:
+```javascript
+'some.key': [
+    './path/to/your/class[classA]'
+]
 ```
 
 ### Custom root directory or configuration file location
