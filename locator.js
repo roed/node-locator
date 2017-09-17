@@ -79,6 +79,11 @@ class Locator {
     _createInstance(locatableConfig) {
         let c = this._require(locatableConfig[0]);
 
+        //if the second argument is a function, use it as factory method
+        if (typeof locatableConfig[1] === 'function') {
+            return locatableConfig[1](this, c);
+        }
+
         let dependencyConfigs = locatableConfig[1] || [];
         let dependencies = [];
         for (let dependencyConfig of dependencyConfigs) {

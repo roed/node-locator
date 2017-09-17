@@ -127,4 +127,21 @@ describe('Locator', () => {
             return e.message === 'Could not require ./some_nested_class[invalidNesting][moreNesting]';
         });
     });
+
+    it('should be able to use a factory method', () => {
+        let service = new SomeService();
+
+        let locator = new Locator(config, {
+            'some.service.with.factory.method': [
+                './some_service', (l, s) => {
+                    assert(l === locator);
+                    assert(s === SomeService);
+                    return service;
+                }
+            ]
+        }, path);
+
+        let result = locator.get('some.service.with.factory.method');
+        assert(result === service);
+    });
 });

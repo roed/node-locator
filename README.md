@@ -133,6 +133,19 @@ These objects can be required like this:
 ]
 ```
 
+### Creating instances using a factory method
+In case you cannot use the default mechanisms of the locator for dependencies, you can use a factory method:
+```javascript
+'some.key': [
+    './path/to/your/class', (locator, YourClass) => {
+        return new YourClass(locator.get('other.dependency'), locator.get('some.weird.dependency').getWeirdDependency());
+    }
+]
+```
+This might be handy in cases like:
+- When a node_modules dependency exposes a factory method. (expressjs is a good example)
+- When you want to bind methods/callbacks or attach event listeners
+
 ### Custom root directory or configuration file location
 It is possible to pass another root directory or configuration file location. You can do this like:
 ```javascript
