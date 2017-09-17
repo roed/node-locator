@@ -138,7 +138,7 @@ In case you cannot use the default mechanisms of the locator for dependencies, y
 ```javascript
 'some.key': [
     './path/to/your/class', (locator, YourClass) => {
-        return new YourClass(locator.get('other.dependency'), locator.get('some.weird.dependency').getWeirdDependency());
+        return new YourClass(locator.get('some.weird.dependency').getWeirdDependency());
     }
 ]
 ```
