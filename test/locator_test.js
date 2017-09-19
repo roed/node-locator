@@ -144,4 +144,17 @@ describe('Locator', () => {
         let result = locator.get('some.service.with.factory.method');
         assert(result === service);
     });
+
+    it('should be able to retrieve a service that depends on another service', () => {
+        let locator = new Locator(config, {
+            'some.service': [
+                './some_service'
+            ],
+            'some.service.alias': 'some.service',
+        }, path);
+
+        let service = locator.get('some.service');
+        let serviceAlias = locator.get('some.service.alias');
+        assert(serviceAlias === service);
+    });
 });

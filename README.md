@@ -146,6 +146,16 @@ This might be handy in cases like:
 - When a node_modules dependency exposes a factory method. (expressjs is a good example)
 - When you want to bind methods/callbacks or attach event listeners
 
+### Using an alias
+In case you want to retrieve an instance by another name:
+```javascript
+'some.key': ['./service/some-service'],
+'some.alias': 'some.key',
+```
+Calling `locator.get('some.alias')` will return the service registered under `some.key` (or create and return it).
+This might be handy if you want to switch a dependency without having through all configuration.
+For instance, if your class is based on an interface. (for example: a logger class with subclasses for console logging and slack logging)
+
 ### Custom root directory or configuration file location
 It is possible to pass another root directory or configuration file location. You can do this like:
 ```javascript

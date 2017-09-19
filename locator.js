@@ -27,13 +27,20 @@ class Locator {
             return this._locatable[name];
         }
 
-        //there is locatable config, so create an instance
-        if (this._locatableConfig[name] !== undefined) {
-            this._locatable[name] = this._createInstance(this._locatableConfig[name]);
+        //there is no locatable config, throw an error
+        if (this._locatableConfig[name] === undefined) {
+            throw new Error('Could not retrieve an instance for ' + name);
+        }
+
+        //it's an alias, return the referenced object
+        if (typeof this._locatableConfig[name] === 'string') {
+            this._locatable[name] = this.get(this._locatableConfig[name]);
             return this._locatable[name];
         }
 
-        throw new Error('Could not retrieve an instance for ' + name);
+        //create an instance based on the configuration
+        this._locatable[name] = this._createInstance(this._locatableConfig[name]);
+        return this._locatable[name];
     }
 
     /**
@@ -72,7 +79,7 @@ class Locator {
     }
 
     /**
-     * @param {{}} locatableConfig
+     * @param {{Array}|{string}} locatableConfig
      * @return {object}
      * @private
      */
