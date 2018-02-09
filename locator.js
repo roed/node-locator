@@ -48,11 +48,6 @@ class Locator {
      * @returns {object}
      * @private
      */
-    /**
-     * @param {string} requirable
-     * @returns {object}
-     * @private
-     */
     _require(requirable) {
         const originalRequirable = requirable;
 
