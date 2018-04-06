@@ -147,7 +147,7 @@ And it also possible to only define a key and method for maximum flexibility:
 'some.key': (locator, config) => {
     const YourClass = require('./path/to/your/class');
     return new YourClass(locator.get('some.weird.dependency').getWeirdDependency(), config.get('some.config.property'));
-]
+}
 ```
 This might be handy in cases like:
 - When a node_modules dependency exposes a factory method. (expressjs is a good example)
