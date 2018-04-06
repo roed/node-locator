@@ -137,14 +137,22 @@ These objects can be required like this:
 In case you cannot use the default mechanisms of the locator for dependencies, you can use a factory method:
 ```javascript
 'some.key': [
-    './path/to/your/class', (locator, YourClass) => {
+    './path/to/your/class', (locator, YourClass, config) => {
         return new YourClass(locator.get('some.weird.dependency').getWeirdDependency());
     }
+]
+```
+And it also possible to only define a key and method for maximum flexibility:
+```javascript
+'some.key': (locator, config) => {
+    const YourClass = require('./path/to/your/class');
+    return new YourClass(locator.get('some.weird.dependency').getWeirdDependency(), config.get('some.config.property'));
 ]
 ```
 This might be handy in cases like:
 - When a node_modules dependency exposes a factory method. (expressjs is a good example)
 - When you want to bind methods/callbacks or attach event listeners
+- When you want to assign other values than methods/objects to locator keys (eg: a string constructed from config values)
 
 ### Using an alias
 In case you want to retrieve an instance by another name:

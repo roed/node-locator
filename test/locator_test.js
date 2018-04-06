@@ -128,17 +128,33 @@ describe('Locator', () => {
         });
     });
 
-    it('should be able to use a factory method', () => {
+    it('should be able to use a factory method instead of an array with arguments', () => {
         let service = new SomeService();
 
         let locator = new Locator(config, {
             'some.service.with.factory.method': [
-                './some_service', (l, s) => {
+                './some_service', (l, s, c) => {
                     assert(l === locator);
                     assert(s === SomeService);
+                    assert(c === config);
                     return service;
                 }
             ]
+        }, path);
+
+        let result = locator.get('some.service.with.factory.method');
+        assert(result === service);
+    });
+
+    it('should be able to use a factory method for a key', () => {
+        let service = new SomeService();
+
+        let locator = new Locator(config, {
+            'some.service.with.factory.method': (l, c) => {
+                assert(l === locator);
+                assert(c === config);
+                return service;
+            }
         }, path);
 
         let result = locator.get('some.service.with.factory.method');
