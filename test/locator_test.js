@@ -86,6 +86,19 @@ describe('Locator', () => {
         assert.strictEqual(service.requirableFunction, fn);
     });
 
+    it('should be able to use a non-constructable require', () => {
+        const locator = new Locator(config, {
+            'some.data': [
+                './some_data'
+            ],
+        }, path);
+
+        const someData = require('./locatable/some_data');
+        
+        const result = locator.get('some.data');
+        assert.strictEqual(result, someData);
+    });
+
     it('should inject normal strings when reserved characters are escaped', () => {
         const reservedCharacters = ['%', '@', '~'];
         for (const reservedCharacter of reservedCharacters) {

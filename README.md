@@ -86,6 +86,14 @@ If you want to inject an instance of a class from the node_modules folder, use t
 ]
 ```
 
+### Using a non-constructable require
+It is possible to use non-constructable entries. The locator will detect if the required file has a constructor. You can define them like this:
+```javascript
+'some.key': [
+    './path/to/your/non-constructable', //will result in something like: const dep = require('./path/to/your/non-constructable');
+]
+```
+
 ### Injecting functions
 Not all dependencies have to be classes. A lot of modules available for node.js expose only a function when required. You can inject them like this:
 ```javascript

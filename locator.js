@@ -91,6 +91,11 @@ class Locator {
             return locatableConfig[1](this, c, this._config);
         }
 
+        //if c is not constructable, return c
+        if (c.prototype === undefined || c.prototype.constructor === undefined) {
+            return c;
+        }
+
         const dependencyConfigs = locatableConfig[1] || [];
         const dependencies = [];
         for (const dependencyConfig of dependencyConfigs) {
