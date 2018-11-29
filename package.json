@@ -1,11 +1,16 @@
 {
   "name": "node-locator",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/mocha test --recursive"
   },
+  "files": [
+    "index.js",
+    "locator.js",
+    "locator_factory.js"
+  ],
   "author": "Ruud Arentsen",
   "license": "MIT",
   "dependencies": {
