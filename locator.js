@@ -57,14 +57,14 @@ class Locator {
         if (requirable.indexOf('[') === -1) {
             return require(requirable);
         }
-        let splittedRequirable = requirable.split('[');
+        const splittedRequirable = requirable.split('[');
         requirable = splittedRequirable[0];
 
         let result = require(requirable);
 
         splittedRequirable.shift();
         while(splittedRequirable.length > 0) {
-            let subRequirable = splittedRequirable.shift().replace(']', '');
+            const subRequirable = splittedRequirable.shift().replace(']', '');
             if (result[subRequirable] === undefined) {
                 throw new Error('Could not require ' + originalRequirable);
             }
@@ -84,16 +84,16 @@ class Locator {
             return locatableConfig(this, this._config);
         }
 
-        let c = this._require(locatableConfig[0]);
+        const c = this._require(locatableConfig[0]);
 
         //if the second argument is a function, use it as factory method
         if (typeof locatableConfig[1] === 'function') {
             return locatableConfig[1](this, c, this._config);
         }
 
-        let dependencyConfigs = locatableConfig[1] || [];
-        let dependencies = [];
-        for (let dependencyConfig of dependencyConfigs) {
+        const dependencyConfigs = locatableConfig[1] || [];
+        const dependencies = [];
+        for (const dependencyConfig of dependencyConfigs) {
             dependencies.push(this._getDependency(dependencyConfig));
         }
         return new c(...dependencies);
@@ -108,25 +108,25 @@ class Locator {
         if (typeof dependencyConfig !== 'string') {
             return dependencyConfig;
         }
-        let firstChar = dependencyConfig[0];
-        let secondChar = dependencyConfig[1];
+        const firstChar = dependencyConfig[0];
+        const secondChar = dependencyConfig[1];
 
         if (this._dependencyConfigIsEscaped(firstChar, secondChar)) {
             return dependencyConfig.substr(1);
         }
         //config parameter
         if (firstChar === '%') {
-            let configName = dependencyConfig.substr(1, dependencyConfig.length - 2);
+            const configName = dependencyConfig.substr(1, dependencyConfig.length - 2);
             return this._config.get(configName);
         }
         //another service
         if (firstChar === '@') {
-            let name = dependencyConfig.substr(1);
+            const name = dependencyConfig.substr(1);
             return this.get(name);
         }
         //require
         if (firstChar === '~') {
-            let requirable = dependencyConfig.substr(1);
+            const requirable = dependencyConfig.substr(1);
             return this._require(requirable);
         }
         return dependencyConfig;

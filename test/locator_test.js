@@ -1,10 +1,10 @@
 'use strict';
 
-let assert = require('assert');
-let Locator = require('../locator');
+const assert = require('assert');
+const Locator = require('../locator');
 
-let SomeService = require('./locatable/some_service');
-let SomeOtherService = require('./locatable/some_other_service');
+const SomeService = require('./locatable/some_service');
+const SomeOtherService = require('./locatable/some_other_service');
 
 describe('Locator', () => {
     const path = './test/locatable/';
@@ -15,7 +15,7 @@ describe('Locator', () => {
     });
 
     it('should be able to retrieve a service that depends on another service', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.service': [
                 './some_service'
             ],
@@ -26,25 +26,25 @@ describe('Locator', () => {
             ],
         }, path);
 
-        let someOtherService = locator.get('some.other.service');
+        const someOtherService = locator.get('some.other.service');
         assert(someOtherService instanceof SomeOtherService);
         assert(someOtherService.someService instanceof SomeService);
     });
 
     it('should create only one instance per key', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.service': [
                 './some_service'
             ]
         }, path);
 
-        let instanceA = locator.get('some.service');
-        let instanceB = locator.get('some.service');
+        const instanceA = locator.get('some.service');
+        const instanceB = locator.get('some.service');
         assert(instanceA === instanceB);
     });
 
     it('should throw an error when the service could not be found', () => {
-        let locator = new Locator(config, {}, path);
+        const locator = new Locator(config, {}, path);
 
         assert.throws(() => {
             locator.get('some.invalid.key');
@@ -54,7 +54,7 @@ describe('Locator', () => {
     });
 
     it('should be able to inject config parameters', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.config.property.dependent.service': [
                 './some_config_property_dependent_service', [
                     '%some.config%'
@@ -63,16 +63,16 @@ describe('Locator', () => {
         }, path);
 
         config.get = function(configKey) {
-            assert.equal(configKey, 'some.config');
+            assert.strictEqual(configKey, 'some.config');
             return 'cool!';
         };
 
-        let service = locator.get('some.config.property.dependent.service');
-        assert.equal(service.someConfigProperty, 'cool!');
+        const service = locator.get('some.config.property.dependent.service');
+        assert.strictEqual(service.someConfigProperty, 'cool!');
     });
 
     it('should be able to inject a "hard" require', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.requirable.dependent.service': [
                 './some_requirable_dependent_service', [
                     '~./some_requirable_function'
@@ -80,16 +80,16 @@ describe('Locator', () => {
             ],
         }, path);
 
-        let fn = require('./locatable/some_requirable_function');
+        const fn = require('./locatable/some_requirable_function');
 
-        let service = locator.get('some.requirable.dependent.service');
+        const service = locator.get('some.requirable.dependent.service');
         assert.strictEqual(service.requirableFunction, fn);
     });
 
     it('should inject normal strings when reserved characters are escaped', () => {
         const reservedCharacters = ['%', '@', '~'];
-        for (let reservedCharacter of reservedCharacters) {
-            let locator = new Locator(config, {
+        for (const reservedCharacter of reservedCharacters) {
+            const locator = new Locator(config, {
                 'some.string.dependent.service': [
                     './some_string_dependent_service', [
                         reservedCharacter + reservedCharacter + 'hi'
@@ -97,25 +97,25 @@ describe('Locator', () => {
                 ],
             }, path);
 
-            let service = locator.get('some.string.dependent.service');
-            assert.equal(reservedCharacter + 'hi', service.someString);
+            const service = locator.get('some.string.dependent.service');
+            assert.strictEqual(reservedCharacter + 'hi', service.someString);
         }
     });
 
     it('should be able to reference classes inside a require', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.nested.class': [
                 './some_nested_class[nested][moreNesting]'
             ],
         }, path);
 
-        let NestedClass = require('./locatable/some_nested_class').nested.moreNesting;
-        let service = locator.get('some.nested.class');
+        const NestedClass = require('./locatable/some_nested_class').nested.moreNesting;
+        const service = locator.get('some.nested.class');
         assert(service instanceof NestedClass);
     });
 
     it('should throw an error a reference to a class inside a require is wrong', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.nested.class': [
                 './some_nested_class[invalidNesting][moreNesting]'
             ],
@@ -129,9 +129,9 @@ describe('Locator', () => {
     });
 
     it('should be able to use a factory method instead of an array with arguments', () => {
-        let service = new SomeService();
+        const service = new SomeService();
 
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.service.with.factory.method': [
                 './some_service', (l, s, c) => {
                     assert(l === locator);
@@ -142,14 +142,14 @@ describe('Locator', () => {
             ]
         }, path);
 
-        let result = locator.get('some.service.with.factory.method');
+        const result = locator.get('some.service.with.factory.method');
         assert(result === service);
     });
 
     it('should be able to use a factory method for a key', () => {
-        let service = new SomeService();
+        const service = new SomeService();
 
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.service.with.factory.method': (l, c) => {
                 assert(l === locator);
                 assert(c === config);
@@ -157,20 +157,20 @@ describe('Locator', () => {
             }
         }, path);
 
-        let result = locator.get('some.service.with.factory.method');
+        const result = locator.get('some.service.with.factory.method');
         assert(result === service);
     });
 
     it('should be able to retrieve a service that depends on another service', () => {
-        let locator = new Locator(config, {
+        const locator = new Locator(config, {
             'some.service': [
                 './some_service'
             ],
             'some.service.alias': 'some.service',
         }, path);
 
-        let service = locator.get('some.service');
-        let serviceAlias = locator.get('some.service.alias');
+        const service = locator.get('some.service');
+        const serviceAlias = locator.get('some.service.alias');
         assert(serviceAlias === service);
     });
 });

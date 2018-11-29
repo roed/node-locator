@@ -11,11 +11,11 @@ module.exports = function(relativePathModifierToRoot, locatorConfigPath) {
     relativePathModifierToRoot = relativePathModifierToRoot || '../../';
     locatorConfigPath = locatorConfigPath || 'config/locator/';
 
-    let config = require('config');
-    let Locator = require('./locator');
+    const config = require('config');
+    const Locator = require('./locator');
 
-    let locatableDirectory = relativePathModifierToRoot + locatorConfigPath;
-    let locatableDefault = require(locatableDirectory + 'default');
+    const locatableDirectory = relativePathModifierToRoot + locatorConfigPath;
+    const locatableDefault = require(locatableDirectory + 'default');
     let locatable = Object.assign({}, locatableDefault);
 
     //load another config based on the environment
