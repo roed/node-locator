@@ -1,6 +1,6 @@
 {
   "name": "node-locator",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
   "author": "Ruud Arentsen",
   "license": "MIT",
   "dependencies": {
-    "config": "^1.26.1"
+    "config": ">=1.26.1"
   },
   "devDependencies": {
     "mocha": "^3.3.0"
