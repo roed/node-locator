@@ -87,14 +87,14 @@ export default class Locator {
     async _createInstance(locatableConfig) {
         //the config is a factory method, call and return it
         if (typeof locatableConfig === 'function') {
-            return locatableConfig(this, this._config);
+            return await locatableConfig(this, this._config);
         }
 
         const c = await this._import(locatableConfig[0]);
 
         //if the second argument is a function, use it as factory method
         if (typeof locatableConfig[1] === 'function') {
-            return locatableConfig[1](this, c, this._config);
+            return await locatableConfig[1](this, c, this._config);
         }
 
         //if c is not constructable, return c
