@@ -183,10 +183,11 @@ The factory will look for the service definitions in `/some/other/root/custom-co
 
 ## Creating the Locator manually
 It is also possible to use the locator manually, which will give you the flexibility to create multiple locators, or skip the environment/config file part:
+
 ```javascript
-const Locator = require('node-locator').Locator;
+const Locator = require('node-locator').LocatorEsm;
 const locator = new Locator(require('config'), {
-    //define your services like above
+  //define your services like above
 });
 ```
 The third parameter of the constructor can be used to define another root directory. The logic is the same as that for the factory.
