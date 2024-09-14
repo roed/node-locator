@@ -52,7 +52,7 @@ class Locator {
         const originalRequirable = requirable;
 
         if (requirable[0] === '.' && requirable[1] === '/') {
-            requirable = this._relativePathModifierToRoot + requirable.substr(2);
+            requirable = this._relativePathModifierToRoot + requirable.substring(2);
         }
         if (requirable.indexOf('[') === -1) {
             return require(requirable);
@@ -117,21 +117,21 @@ class Locator {
         const secondChar = dependencyConfig[1];
 
         if (this._dependencyConfigIsEscaped(firstChar, secondChar)) {
-            return dependencyConfig.substr(1);
+            return dependencyConfig.substring(1);
         }
         //config parameter
         if (firstChar === '%') {
-            const configName = dependencyConfig.substr(1, dependencyConfig.length - 2);
+            const configName = dependencyConfig.substring(1, dependencyConfig.length - 1);
             return this._config.get(configName);
         }
         //another service
         if (firstChar === '@') {
-            const name = dependencyConfig.substr(1);
+            const name = dependencyConfig.substring(1);
             return this.get(name);
         }
         //require
         if (firstChar === '~') {
-            const requirable = dependencyConfig.substr(1);
+            const requirable = dependencyConfig.substring(1);
             return this._require(requirable);
         }
         return dependencyConfig;
