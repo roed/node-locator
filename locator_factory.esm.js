@@ -2,25 +2,25 @@
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+import Locator from './locator.esm.js';
+import config from 'config'
+
 /**
  * @param {string} relativePathModifierToRoot
  * @param {string} locatorConfigPath
  * @returns {Locator}
  */
-module.exports = function(relativePathModifierToRoot, locatorConfigPath) {
+export default async function(relativePathModifierToRoot, locatorConfigPath) {
     relativePathModifierToRoot = relativePathModifierToRoot || '../../';
     locatorConfigPath = locatorConfigPath || 'config/locator/';
 
-    const config = require('config');
-    const Locator = require('./locator');
-
     const locatableDirectory = relativePathModifierToRoot + locatorConfigPath;
-    const locatableDefault = require(locatableDirectory + 'default');
+    const locatableDefault = (await import(locatableDirectory + 'default.js')).default;
     let locatable = Object.assign({}, locatableDefault);
 
     //load another config based on the environment
     try {
-        let locatableForEnvironment = require( locatableDirectory + NODE_ENV );
+        let locatableForEnvironment = (await import( locatableDirectory + NODE_ENV + '.js' )).default;
         locatable = Object.assign(locatable, locatableForEnvironment);
     } catch (e) {}
 

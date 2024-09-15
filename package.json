@@ -1,26 +1,37 @@
 {
   "name": "node-locator",
-  "version": "0.0.13",
+  "version": "1.0.0",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
-  "main": "index.js",
+  "main": "index.cjs.js",
+  "module": "index.esm.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "require": "./index.cjs.js",
+      "import": "./index.esm.js"
+    }
+  },
   "scripts": {
     "test": "node_modules/.bin/mocha test --recursive"
   },
   "files": [
-    "index.js",
-    "locator.js",
-    "locator_factory.js"
+    "index.cjs.js",
+    "index.esm.js",
+    "locator.cjs",
+    "locator.esm.js",
+    "locator_factory.cjs",
+    "locator_factory.esm.js"
   ],
   "author": "Ruud Arentsen",
   "license": "MIT",
   "dependencies": {
-    "config": ">=1.26.1"
-  },
-  "devDependencies": {
-    "mocha": "^3.3.0"
+    "config": "^3.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/roed/node-locator.git"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.3"
   }
 }

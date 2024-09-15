@@ -1,6 +1,6 @@
 'use strict';
 
-class Locator {
+export default class Locator {
 
     /**
      * @param {config} config
@@ -21,7 +21,7 @@ class Locator {
      * @param {string} name
      * @returns {object}
      */
-    get(name) {
+    async get(name) {
         //there is already an instance
         if (this._locatable[name] !== undefined) {
             return this._locatable[name];
@@ -34,7 +34,7 @@ class Locator {
 
         //it's an alias, return the referenced object
         if (typeof this._locatableConfig[name] === 'string') {
-            this._locatable[name] = this.get(this._locatableConfig[name]);
+            this._locatable[name] = await this.get(this._locatableConfig[name]);
             return this._locatable[name];
         }
 
@@ -48,23 +48,29 @@ class Locator {
      * @returns {object}
      * @private
      */
-    _require(requirable) {
+    async _import(requirable) {
         const originalRequirable = requirable;
 
         if (requirable[0] === '.' && requirable[1] === '/') {
-            requirable = this._relativePathModifierToRoot + requirable.substr(2);
+            requirable = this._relativePathModifierToRoot + requirable.substring(2);
         }
         if (requirable.indexOf('[') === -1) {
-            return require(requirable);
+            return (await import(requirable)).default;
         }
         const splittedRequirable = requirable.split('[');
         requirable = splittedRequirable[0];
 
-        let result = require(requirable);
+        let result = await import(requirable)
 
+        let determineIfDefaultShouldBeUsed = true
         splittedRequirable.shift();
         while(splittedRequirable.length > 0) {
             const subRequirable = splittedRequirable.shift().replace(']', '');
+            if (determineIfDefaultShouldBeUsed && result.default !== undefined && result[subRequirable] === undefined) {
+                determineIfDefaultShouldBeUsed = false
+                result = result.default
+            }
+
             if (result[subRequirable] === undefined) {
                 throw new Error('Could not require ' + originalRequirable);
             }
@@ -78,17 +84,17 @@ class Locator {
      * @return {object}
      * @private
      */
-    _createInstance(locatableConfig) {
+    async _createInstance(locatableConfig) {
         //the config is a factory method, call and return it
         if (typeof locatableConfig === 'function') {
-            return locatableConfig(this, this._config);
+            return await locatableConfig(this, this._config);
         }
 
-        const c = this._require(locatableConfig[0]);
+        const c = await this._import(locatableConfig[0]);
 
         //if the second argument is a function, use it as factory method
         if (typeof locatableConfig[1] === 'function') {
-            return locatableConfig[1](this, c, this._config);
+            return await locatableConfig[1](this, c, this._config);
         }
 
         //if c is not constructable, return c
@@ -99,7 +105,7 @@ class Locator {
         const dependencyConfigs = locatableConfig[1] || [];
         const dependencies = [];
         for (const dependencyConfig of dependencyConfigs) {
-            dependencies.push(this._getDependency(dependencyConfig));
+            dependencies.push(await this._getDependency(dependencyConfig));
         }
         return new c(...dependencies);
     }
@@ -109,7 +115,7 @@ class Locator {
      * @returns {object|*}
      * @private
      */
-    _getDependency(dependencyConfig) {
+    async _getDependency(dependencyConfig) {
         if (typeof dependencyConfig !== 'string') {
             return dependencyConfig;
         }
@@ -117,22 +123,22 @@ class Locator {
         const secondChar = dependencyConfig[1];
 
         if (this._dependencyConfigIsEscaped(firstChar, secondChar)) {
-            return dependencyConfig.substr(1);
+            return dependencyConfig.substring(1);
         }
         //config parameter
         if (firstChar === '%') {
-            const configName = dependencyConfig.substr(1, dependencyConfig.length - 2);
+            const configName = dependencyConfig.substring(1, dependencyConfig.length - 1);
             return this._config.get(configName);
         }
         //another service
         if (firstChar === '@') {
-            const name = dependencyConfig.substr(1);
-            return this.get(name);
+            const name = dependencyConfig.substring(1);
+            return await this.get(name);
         }
         //require
         if (firstChar === '~') {
-            const requirable = dependencyConfig.substr(1);
-            return this._require(requirable);
+            const requirable = dependencyConfig.substring(1);
+            return await this._import(requirable);
         }
         return dependencyConfig;
     }
@@ -150,5 +156,3 @@ class Locator {
         return firstChar === secondChar;
     }
 }
-
-module.exports = Locator;

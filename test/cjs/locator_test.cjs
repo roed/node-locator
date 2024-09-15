@@ -1,13 +1,13 @@
 'use strict';
 
 const assert = require('assert');
-const Locator = require('../locator');
+const Locator = require('../../locator.cjs');
 
-const SomeService = require('./locatable/some_service');
-const SomeOtherService = require('./locatable/some_other_service');
+const SomeService = require('./locatable/some_service.cjs');
+const SomeOtherService = require('./locatable/some_other_service.cjs');
 
 describe('Locator', () => {
-    const path = './test/locatable/';
+    const path = './test/cjs/locatable/';
     let config = {};
 
     beforeEach(() => {
@@ -17,10 +17,10 @@ describe('Locator', () => {
     it('should be able to retrieve a service that depends on another service', () => {
         const locator = new Locator(config, {
             'some.service': [
-                './some_service'
+                './some_service.cjs'
             ],
             'some.other.service': [
-                './some_other_service', [
+                './some_other_service.cjs', [
                     '@some.service'
                 ]
             ],
@@ -34,7 +34,7 @@ describe('Locator', () => {
     it('should create only one instance per key', () => {
         const locator = new Locator(config, {
             'some.service': [
-                './some_service'
+                './some_service.cjs'
             ]
         }, path);
 
@@ -56,7 +56,7 @@ describe('Locator', () => {
     it('should be able to inject config parameters', () => {
         const locator = new Locator(config, {
             'some.config.property.dependent.service': [
-                './some_config_property_dependent_service', [
+                './some_config_property_dependent_service.cjs', [
                     '%some.config%'
                 ]
             ],
@@ -74,13 +74,13 @@ describe('Locator', () => {
     it('should be able to inject a "hard" require', () => {
         const locator = new Locator(config, {
             'some.requirable.dependent.service': [
-                './some_requirable_dependent_service', [
-                    '~./some_requirable_function'
+                './some_requirable_dependent_service.cjs', [
+                    '~./some_requirable_function.cjs'
                 ]
             ],
         }, path);
 
-        const fn = require('./locatable/some_requirable_function');
+        const fn = require('./locatable/some_requirable_function.cjs');
 
         const service = locator.get('some.requirable.dependent.service');
         assert.strictEqual(service.requirableFunction, fn);
@@ -89,11 +89,11 @@ describe('Locator', () => {
     it('should be able to use a non-constructable require', () => {
         const locator = new Locator(config, {
             'some.data': [
-                './some_data'
+                './some_data.cjs'
             ],
         }, path);
 
-        const someData = require('./locatable/some_data');
+        const someData = require('./locatable/some_data.cjs');
         
         const result = locator.get('some.data');
         assert.strictEqual(result, someData);
@@ -104,7 +104,7 @@ describe('Locator', () => {
         for (const reservedCharacter of reservedCharacters) {
             const locator = new Locator(config, {
                 'some.string.dependent.service': [
-                    './some_string_dependent_service', [
+                    './some_string_dependent_service.cjs', [
                         reservedCharacter + reservedCharacter + 'hi'
                     ]
                 ],
@@ -118,11 +118,11 @@ describe('Locator', () => {
     it('should be able to reference classes inside a require', () => {
         const locator = new Locator(config, {
             'some.nested.class': [
-                './some_nested_class[nested][moreNesting]'
+                './some_nested_class.cjs[nested][moreNesting]'
             ],
         }, path);
 
-        const NestedClass = require('./locatable/some_nested_class').nested.moreNesting;
+        const NestedClass = require('./locatable/some_nested_class.cjs').nested.moreNesting;
         const service = locator.get('some.nested.class');
         assert(service instanceof NestedClass);
     });
@@ -130,14 +130,14 @@ describe('Locator', () => {
     it('should throw an error a reference to a class inside a require is wrong', () => {
         const locator = new Locator(config, {
             'some.nested.class': [
-                './some_nested_class[invalidNesting][moreNesting]'
+                './some_nested_class.cjs[invalidNesting][moreNesting]'
             ],
         }, path);
 
         assert.throws(() => {
             locator.get('some.nested.class');
         }, (e) => {
-            return e.message === 'Could not require ./some_nested_class[invalidNesting][moreNesting]';
+            return e.message === 'Could not require ./some_nested_class.cjs[invalidNesting][moreNesting]';
         });
     });
 
@@ -146,7 +146,7 @@ describe('Locator', () => {
 
         const locator = new Locator(config, {
             'some.service.with.factory.method': [
-                './some_service', (l, s, c) => {
+                './some_service.cjs', (l, s, c) => {
                     assert(l === locator);
                     assert(s === SomeService);
                     assert(c === config);
@@ -177,7 +177,7 @@ describe('Locator', () => {
     it('should be able to retrieve a service that depends on another service', () => {
         const locator = new Locator(config, {
             'some.service': [
-                './some_service'
+                './some_service.cjs'
             ],
             'some.service.alias': 'some.service',
         }, path);
