@@ -1,13 +1,13 @@
 {
   "name": "node-locator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
   "main": "index.cjs.js",
   "module": "index.esm.js",
   "type": "module",
   "exports": {
     ".": {
-      "require": "./index.cjs.js",
+      "require": "./index.cjs",
       "import": "./index.esm.js"
     }
   },
@@ -15,7 +15,7 @@
     "test": "node_modules/.bin/mocha test --recursive"
   },
   "files": [
-    "index.cjs.js",
+    "index.cjs",
     "index.esm.js",
     "locator.cjs",
     "locator.esm.js",
