@@ -12,7 +12,7 @@ module.exports = function(relativePathModifierToRoot, locatorConfigPath) {
     locatorConfigPath = locatorConfigPath || 'config/locator/';
 
     const config = require('config');
-    const Locator = require('./locator.esm.js');
+    const Locator = require('./locator.cjs');
 
     const locatableDirectory = relativePathModifierToRoot + locatorConfigPath;
     const locatableDefault = require(locatableDirectory + 'default');
