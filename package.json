@@ -15,9 +15,12 @@
     "test": "node_modules/.bin/mocha test --recursive"
   },
   "files": [
-    "index.js",
+    "index.cjs.js",
+    "index.esm.js",
+    "locator.cjs",
     "locator.esm.js",
-    "locator_factory.js"
+    "locator_factory.cjs",
+    "locator_factory.esm.js"
   ],
   "author": "Ruud Arentsen",
   "license": "MIT",
