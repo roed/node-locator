@@ -1,8 +1,8 @@
 {
   "name": "node-locator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple dependency injection container/locator for nodejs based on config files",
-  "main": "index.cjs.js",
+  "main": "index.cjs",
   "module": "index.esm.js",
   "type": "module",
   "exports": {
