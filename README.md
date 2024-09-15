@@ -1,17 +1,26 @@
 # node-locator
 
-[![NPM](https://img.shields.io/npm/dm/node-locator.svg)](https://npmjs.org/package/node-locator)&nbsp;&nbsp;
-[![Build Status](https://secure.travis-ci.org/roed/node-locator.svg?branch=master)](https://travis-ci.org/roed/node-locator)
+[![NPM](https://img.shields.io/npm/dm/node-locator.svg)](https://npmjs.org/package/node-locator)
 
 A simple service locator and dependency container for Node.js using service definition files.
+
+It supports a CommonJS and ESM implementation.
+
+When using in an ESM project, the locator uses **async functions**, as it relies on the `import()` function.
 
 ## Example usage
 A lot of node.js code is written with ES6 classes. This module can manage dependencies and instances for your codebase.
 No need to to this anymore:
 ```javascript
+//CommonJS
 const Service = require('../../../service/some-service');
 const SomeDependency1 = require('../../../other/dir/some-dependency-1');
 const SomeDependency2 = require('../../../other/dir/some-dependency-2');
+
+//ESM
+import Service from '../../../service/some-service';
+import SomeDependency1 from '../../../other/dir/some-dependency-1';
+import SomeDependency2 from '../../../other/dir/some-dependency-2';
 
 const someDependency1 = new SomeDependency1();
 const someDependency2 = new SomeDependency2();
@@ -23,15 +32,21 @@ service.doSomething();
 But instead configure your dependencies with configuration files:
 ```javascript
 module.exports = {
-    'some.key': ['./service/some-service', ['@dependency-1', '@dependency-2']],
-    'dependency-1': ['./other/dir/some-dependency-1'],
-    'dependency-2': ['./other/dir/some-dependency-2'],
+    'some.key': ['./service/some-service.js', ['@dependency-1', '@dependency-2']],
+    'dependency-1': ['./other/dir/some-dependency-1.js'],
+    'dependency-2': ['./other/dir/some-dependency-2.js'],
 }
 ```
 
-The locator will automatically create (and cache) instances when needed:
+## Using the locator
+You can use the locator by calling the `get` method. The locator will automatically create (and cache) instances when needed:
 ```javascript
+//CommonJS
 const service = locator.get('some.service');
+
+//ESM
+const service = await locator.get('some.service');
+
 service.doSomething();
 ```
 
@@ -53,10 +68,26 @@ Create a directory `config/locator`. In that directory, add a file called `defau
 
 The file should look like this:
 ```javascript
+//CommonJS
 module.exports = {
     //the key that can be used to locate/inject this class
     'some.key': [
         './relative/path/to/your/class', //this is the relative path from the root of your application
+        //constructor arguments
+        [
+            '@key.of.another.class.this.class.depends.on', //reference to another class
+            '%some.config.property%' //reference to a config property -> will inject config.get('some.config.property')
+        ]
+    ],
+    'key.of.another.class.this.class.depends.on': [],
+    //etc
+}
+
+//ESM
+export default {
+    //the key that can be used to locate/inject this class
+    'some.key': [
+        './relative/path/to/your/class.js', //this is the relative path from the root of your application
         //constructor arguments
         [
             '@key.of.another.class.this.class.depends.on', //reference to another class
@@ -72,45 +103,66 @@ By creating a `development.js`, you can override certain definitions.
 Using the factory:
 ```javascript
 //this will create an instance of the Locator
+
+//CommonJS
 const locator = require('node-locator').LocatorFactory();
+//ESM
+import { LocatorFactory } from 'node-locator'
+const locator = await LocatorFactory()
 ```
 
 ### Injecting class based dependencies from node_modules
 If you want to inject an instance of a class from the node_modules folder, use the following code:
 ```javascript
 'some-node-modules-dependency-key': [
-    'some-node-dependency', //will result in something like: const dep = require('some-node-dependency'); new dep(//constructor args);
+    'some-node-dependency',
     [
         //constructor args
     ]
 ]
+
+// will result in something like:
+// CommonJS: const dep = require('some-node-dependency'); new dep(//constructor args); 
+// ESM: import dep from 'some-node-dependency'; new dep(//constructor args);
 ```
 
 ### Using a non-constructable require
 It is possible to use non-constructable entries. The locator will detect if the required file has a constructor. You can define them like this:
 ```javascript
 'some.key': [
-    './path/to/your/non-constructable', //will result in something like: const dep = require('./path/to/your/non-constructable');
+    './path/to/your/non-constructable.js',
 ]
+
+// will result in something like:
+// CommonJS: const dep = require('./path/to/your/non-constructable.js'); 
+// ESM: import dep from './path/to/your/non-constructable.js';
 ```
 
 ### Injecting functions
 Not all dependencies have to be classes. A lot of modules available for node.js expose only a function when required. You can inject them like this:
 ```javascript
 'some.key': [
-    './path/to/your/class',
+    './path/to/your/class.js',
     [
-        '~some-function', //will result in require('some-function')
-        '~./some-non-node-modules-function' //will result in require('./path/to/your/some-non-node-modules-function')
+        '~some-function',
+        '~./some-non-node-modules-function.js'
     ]
 ]
+
+// '~some-function' will result in something like:
+// CommonJS: const someFunction = require('some-function') 
+// ESM: import someFunction from 'some-function';
+
+// '~./some-non-node-modules-function.js' will result in something like:
+// CommonJS: const someNonNodeModulesFunction = require('./path/to/your/some-non-node-modules-function.js') 
+// ESM: import someNonNodeModulesFunction from './path/to/your/some-non-node-modules-function.js';
 ```
 
 ### Injecting primitive values
 It's also possible to inject primitive values:
 ```javascript
 'some.key': [
-    './path/to/your/class',
+    './path/to/your/class.js',
     [
         123,
         true,
@@ -128,16 +180,21 @@ Because the locator also uses strings to inject other dependencies, if the strin
 ### Require nested classes
 Sometimes, a module exposes an object containing classes. For instance:
 ```javascript
+//CommonJS
 module.exports {
     classA: ClassA,
     classB: ClassB
 }
+
+//ESM
+export class ClassA {}
+export class ClassB {}
 ```
 
 These objects can be required like this:
 ```javascript
 'some.key': [
-    './path/to/your/class[classA]'
+    './path/to/your/class.js[classA]'
 ]
 ```
 
@@ -145,15 +202,22 @@ These objects can be required like this:
 In case you cannot use the default mechanisms of the locator for dependencies, you can use a factory method:
 ```javascript
 'some.key': [
-    './path/to/your/class', (locator, YourClass, config) => {
+    './path/to/your/class.js', (locator, YourClass, config) => {
         return new YourClass(locator.get('some.weird.dependency').getWeirdDependency());
     }
 ]
 ```
 And it also possible to only define a key and method for maximum flexibility:
 ```javascript
+//CommonJS
 'some.key': (locator, config) => {
-    const YourClass = require('./path/to/your/class');
+    const YourClass = require('./path/to/your/class.js');
+    return new YourClass(locator.get('some.weird.dependency').getWeirdDependency(), config.get('some.config.property'));
+}
+
+//ESM
+'some.key': async (locator, config) => {
+    const YourClass = (await import('./path/to/your/class.js')).YourClass;
     return new YourClass(locator.get('some.weird.dependency').getWeirdDependency(), config.get('some.config.property'));
 }
 ```
@@ -165,7 +229,7 @@ This might be handy in cases like:
 ### Using an alias
 In case you want to retrieve an instance by another name:
 ```javascript
-'some.key': ['./service/some-service'],
+'some.key': ['./service/some-service.js'],
 'some.alias': 'some.key',
 ```
 Calling `locator.get('some.alias')` will return the service registered under `some.key` (or create and return it).
@@ -175,7 +239,12 @@ For instance, if your class is based on an interface. (for example: a logger cla
 ### Custom root directory or configuration file location
 It is possible to pass another root directory or configuration file location. You can do this like:
 ```javascript
+//CommonJS
 const locator = require('node-locator').LocatorFactory('../../some/other/root/', 'custom-config-dir/');
+
+//ESM
+import { LocatorFactory } from 'node-locator'
+const locator = await LocatorFactory('../../some/other/root/', 'custom-config-dir/');
 ```
 The locator will look for your classes in the directory `/some/other/root/`. The `../../` is needed because node.js uses relative paths. Because this module will be installed in `node_modules/node-locator`, we need to go 2 directories up first.
 
@@ -185,18 +254,18 @@ The factory will look for the service definitions in `/some/other/root/custom-co
 It is also possible to use the locator manually, which will give you the flexibility to create multiple locators, or skip the environment/config file part:
 
 ```javascript
-const Locator = require('node-locator').LocatorEsm;
+//CommonJS
+const Locator = require('node-locator').Locator;
 const locator = new Locator(require('config'), {
   //define your services like above
 });
+
+//ESM
+import { Locator } from 'node-locator';
+import config from 'config';
+const locator = new Locator(config);
 ```
 The third parameter of the constructor can be used to define another root directory. The logic is the same as that for the factory.
-
-## Using the locator
-You can use the locator by calling the `get` method
-```javascript
-const instanceOfYourClass = locator.get('some.key');
-```
 
 ## Dependencies
 
